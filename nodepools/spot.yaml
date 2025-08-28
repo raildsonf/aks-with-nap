@@ -1,0 +1,30 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: spot
+spec:
+  disruption:
+    budgets:
+    - nodes: 10%
+    - schedule: "0 4 * * mon-fri"
+      duration: 20h
+      nodes: "0"
+    consolidateAfter: 15m
+    consolidationPolicy: WhenEmptyOrUnderutilized
+  weight: 10
+  template:
+    metadata:
+      labels:
+        cluster: aks-nap-demo
+    spec:
+      expireAfter: Never
+      terminationGracePeriod: 300s
+      nodeClassRef:
+        group: karpenter.azure.com
+        kind: AKSNodeClass
+        name: ubuntu2204
+      requirements:
+      - key: kubernetes.io/os
+        operator: In
+        values:
+        - linux

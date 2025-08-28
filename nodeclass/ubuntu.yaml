@@ -1,0 +1,10 @@
+---
+apiVersion: karpenter.azure.com/v1beta1
+kind: AKSNodeClass
+metadata:
+  finalizers:
+  - karpenter.azure.com/termination
+  name: ubuntu2204
+spec:
+  imageFamily: Ubuntu2204
+  osDiskSizeGB: 30

@@ -1,0 +1,44 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: on-demand
+spec:
+  disruption:
+    budgets:
+    - nodes: 10%
+    - schedule: "0 4 * * mon-fri"
+      duration: 20h
+      nodes: "0"
+    consolidateAfter: 1m
+    consolidationPolicy: WhenEmptyOrUnderutilized
+  weight: 1
+  template:
+    metadata:
+      labels:
+        cluster: aks-nap-demo
+    spec:
+      expireAfter: Never
+      terminationGracePeriod: 300s
+      nodeClassRef:
+        group: karpenter.azure.com
+        kind: AKSNodeClass
+        name: ubuntu2204
+      requirements:
+      - key: kubernetes.io/arch
+        operator: In
+        values:
+        - amd64
+      - key: kubernetes.io/os
+        operator: In
+        values:
+        - linux
+      - key: karpenter.sh/capacity-type
+        operator: In
+        values:
+        - on-demand
+      - key: karpenter.azure.com/sku-family
+        operator: In
+        values:
+        - D
+        - F
+        - E

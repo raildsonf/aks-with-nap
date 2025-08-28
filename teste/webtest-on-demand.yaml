@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webtest-on-demand
+  labels:
+    app: webtest-on-demand
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webtest-on-demand
+  template:
+    metadata:
+      labels:
+        app: webtest-on-demand
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: karpenter.sh/capacity-type
+                    operator: In
+                    values:
+                      - on-demand
+      containers:
+        - name: httpd
+          image: httpd
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "20Mi"
+            limits:
+              cpu: "20m"
+              memory: "20Mi"
