@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-deployment
+  labels:
+    app: httpd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpd
+  template:
+    metadata:
+      labels:
+        app: httpd
+    spec:
+      containers:
+      - name: httpd
+        image: httpd:2.4
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 10m
+          limits:
+            cpu: 20m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd-svc
+  labels:
+    app: httpd
+spec:
+  type: ClusterIP
+  selector:
+    app: httpd
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: httpd-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: httpd-deployment
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 30
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: httpd-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: dhub2webhook.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: httpd-svc
+                port:
+                  number: 80

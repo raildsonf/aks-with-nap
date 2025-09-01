@@ -1,19 +1,19 @@
 variable "subscription_id" {
   description = "Azure Subscription ID"
-  default     = ""
+  default     = "4777093...................."
 }
 
 variable "tenant_id" {
   description = "Azure Tenant ID"
-  default     = ""
+  default     = "faca7....................."
 }
 
 variable "location" {
-  default = "westus3"
+  default = "eastus"
 }
 
 variable "rg_name" {
-  default = "rg-aks-nap"
+  default = "dhub"
 }
 
 variable "vnet_name" {
